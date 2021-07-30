@@ -17,3 +17,4 @@ for folderName in os.listdir(direc):
     if os.path.isdir(curdir):
         data_list = file_reader.ExtractAllDataFromFolder(curdir)
         graphic_func.MessageFreqGraph(data_list,"month", curdir)
+        graphic_func.UserIndividualGraph(data_list,"month",curdir)

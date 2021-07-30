@@ -24,30 +24,32 @@ def MessageFreqGraph(data_list,time_res,directory):
     my_dic = DoubleDictionnaryExtract(data_list,time_res,lambda a : True)[0]
     
     AddEmptyDates(my_dic,time_res)
-    
-    #must be sorted after adding all the 0 values
-    x,y = zip(*sorted(my_dic.items()))
-    #convert tuple to string (avoid impossible drawings)
-    if time_res == "month":
-        tmpx = []
-        for elt in x: 
-            tmpx.append(str(elt[1])+"\\"+str(elt[0]))
-        x = tmpx
 
-    #set a title to the graph
     FolderName = directory.split("\\")[-1]
     fname = FolderName.split("_")
-    plt.title(fname[0])
+    GraphTracer(time_res,my_dic,directory,title=fname[0],filename="message_freq.png")
+    
+   
+def UserIndividualGraph(data_list,time_res,directory):
+    """Traces two graph, one for each user
 
-    plt.plot(x,y)
-    #needs to remove some of the label for month, or not readable
-    if time_res == "month":
-        ax = plt.gca()
-        for label in ax.get_xaxis().get_ticklabels()[::2]:
-            label.set_visible(False)
-    #autofm_date rotate the label
-    plt.gcf().autofmt_xdate()
-    plt.savefig(os.path.join(directory,'messages_freq.png'), dpi=300)
+    Args:
+        data_list (list(dict)):   Extracted from .json files
+        time_res (string): the resolution of the graph samples. Put "day" or "month"
+        directory (string): the directory where is stored the .json files and where the graph will
+        be stored
+    """
+    user0 = data_list[0]["participants"][0]["name"]
+    user1 = data_list[0]["participants"][1]["name"]
+
+    test = (lambda a : a["sender_name"] == user0)
+
+    user0_dic,user1_dic = DoubleDictionnaryExtract(data_list,time_res,test)
+
+    AddEmptyDates(user0_dic,time_res)
+    AddEmptyDates(user1_dic,time_res)
+
+    GraphTracer(time_res,user0_dic,directory,user1_dic,user0,user1,True,filename="user_message_freq.png");
 
 def AddEmptyDates(dict,time_res):
     """creates all entries that doesn't exist yet.
@@ -107,3 +109,52 @@ def DoubleDictionnaryExtract(data_list,time_res,condition):
                 else:
                     dict_1[date] = 1
     return [dict_0,dict_1]
+
+def GraphTracer(time_res,dic0,directory,dic1={},label0="",label1="",legend=False,title="",filename="unknown.png"):
+    """Trace the graph, create a file and save as a png.
+
+    Args:
+        time_res (string): the time_resolution.
+        dic0 (dict): the first (and mandatory) dictionnary.
+        directory (string): where to store the pic.
+        dic1 (dict, optional): the second one, if they are two. Defaults to {}.
+        label0 (str, optional): label of the first dic data. Defaults to "".
+        label1 (str, optional): label of the second dic data. Defaults to "".
+        legend (bool, optional): shoudl display lengend or not. Defaults to False.
+        title (str, optional): title of the graph. Defaults to "".
+        filename (str, optional): which name to save the pic. Defaults to "unknown.png".
+    """
+    #must be sorted after adding all the 0 values
+    x0,y0 = zip(*sorted(dic0.items()))
+    if time_res == "month":
+        tmpx = []
+        for elt in x0: 
+            tmpx.append(str(elt[1])+"\\"+str(elt[0]))
+        x0 = tmpx
+    if dic1 != {}:
+        x1,y1 = zip(*sorted(dic1.items()))
+        if time_res == "month":
+            tmpx = []
+            for elt in x1: 
+                tmpx.append(str(elt[1])+"\\"+str(elt[0]))
+            x1 = tmpx
+    #convert tuple to string (avoid impossible drawings)
+
+    #set a title to the graph
+    if title != "":
+        plt.title(title)
+
+    plt.plot(x0,y0,label=label0)
+    if dic1 != {}:
+        plt.plot(x0,y1,label=label1)
+    #needs to remove some of the label for month, or not readable
+    if time_res == "month":
+        ax = plt.gca()
+        for label in ax.get_xaxis().get_ticklabels()[::2]:
+            label.set_visible(False)
+    #autofm_date rotate the label
+    plt.gcf().autofmt_xdate()
+    if legend:
+        plt.legend()
+    plt.savefig(os.path.join(directory,filename), dpi=300)
+    plt.show()
