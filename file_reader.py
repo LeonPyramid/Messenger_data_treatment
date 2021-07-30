@@ -3,19 +3,13 @@ import os
 
 
 def ExtractAllDataFromFolder(directory):
-    """
-    Return the dicitonnary stored in each .json file in a list
+    """Return the dicitonnary stored in each .json file in a list
 
-    Parameters
-    ----------
-    directory : string
-        the directory in which the message_x.json are stored
+    Args:
+        directory (string): the directory in which the message_x.json are stored
 
-    Returns
-    -------
-    data_list : list(dict)
-        list of all the dictionnary stored in each .json file
-
+    Returns:
+        list(dict): list of all the dictionnary stored in each .json file
     """
     fileNum = 1
     data_list = []
