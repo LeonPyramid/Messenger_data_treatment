@@ -46,8 +46,10 @@ def UserIndividualGraph(data_list,time_res,directory):
 
     user0_dic,user1_dic = DoubleDictionnaryExtract(data_list,time_res,test)
 
-    AddEmptyDates(user0_dic,time_res)
-    AddEmptyDates(user1_dic,time_res)
+    if(len(user0_dic)>0):
+        AddEmptyDates(user0_dic,time_res)
+    if(len(user1_dic)>0):
+        AddEmptyDates(user1_dic,time_res)
 
     GraphTracer(time_res,user0_dic,directory,user1_dic,user0,user1,True,filename="user_message_freq.png");
 
@@ -146,7 +148,7 @@ def GraphTracer(time_res,dic0,directory,dic1={},label0="",label1="",legend=False
 
     plt.plot(x0,y0,label=label0)
     if dic1 != {}:
-        plt.plot(x0,y1,label=label1)
+        plt.plot(x1,y1,label=label1)
     #needs to remove some of the label for month, or not readable
     if time_res == "month":
         ax = plt.gca()
@@ -157,4 +159,4 @@ def GraphTracer(time_res,dic0,directory,dic1={},label0="",label1="",legend=False
     if legend:
         plt.legend()
     plt.savefig(os.path.join(directory,filename), dpi=300)
-    plt.show()
+    plt.close()
